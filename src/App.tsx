@@ -1,3 +1,4 @@
+// App.tsx
 import { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -12,6 +13,9 @@ import { Testimonials } from "./components/sections/Testimonials";
 import { FAQ } from "./components/sections/FAQ";
 import { Contact } from "./components/sections/Contact";
 import { Sports } from "./components/sections/Sports";
+import { NoticeProvider } from "./context/NoticeContext";
+import NoticeModal from "./components/NoticeModal";
+import NoticeButton from "./components/NoticeButton";
 
 // Section components mapping for dropdown items
 const sectionComponents: Record<string, React.ReactNode> = {
@@ -26,7 +30,6 @@ const sectionComponents: Record<string, React.ReactNode> = {
   FAQ: <FAQ />,
   Contact: <Contact />,
   Sports: <Sports />,
-  // Dropdown sections - using imported components
   Introduction: <About />,
   Mission: <About />,
   ManagingDirector: <About />,
@@ -114,24 +117,9 @@ const sectionComponents: Record<string, React.ReactNode> = {
   ),
 };
 
-// Order of sections for rendering
-const sectionOrder = [
-  "Hero",
-  "About",
-  "Statistics",
-  "Services",
-  "Team",
-  "Activities",
-  "Gallery",
-  "Testimonials",
-  "FAQ",
-  "Contact",
-];
-
-export default function App() {
+function AppContent() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // Handle URL hash changes
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
@@ -142,19 +130,13 @@ export default function App() {
       }
     };
 
-    // Check hash on initial load
     handleHashChange();
-
-    // Listen for hash changes
     window.addEventListener('hashchange', handleHashChange);
-
-    // Cleanup
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
-    // Update URL hash when section changes
     if (section) {
       window.location.hash = section;
     } else {
@@ -162,14 +144,11 @@ export default function App() {
     }
   };
 
-  // Determine what to render
   const renderContent = () => {
-    // If a specific section is selected (from dropdown or URL hash)
     if (activeSection && sectionComponents[activeSection]) {
       return sectionComponents[activeSection];
     }
 
-    // Default: render all sections in order
     return (
       <>
         <Hero />
@@ -194,6 +173,15 @@ export default function App() {
       />
       <main>{renderContent()}</main>
       <Footer />
+      <NoticeModal />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <NoticeProvider>
+      <AppContent />
+    </NoticeProvider>
   );
 }
